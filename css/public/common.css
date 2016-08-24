@@ -1,0 +1,8 @@
+.error{
+    color: #FB1919 !Important;
+    font-size: 14px;  
+}
+.mandatory {
+  color: #f60;
+  font-size: 16px;
+}
