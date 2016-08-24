@@ -42,6 +42,8 @@ class User extends CI_Controller{
             $signupResponse =$this->userHandler->signup($inputArray);
             if($signupResponse['status'] && $signupResponse['response']['userId']>0 ){               
                $signupSuccess=TRUE;
+            }else{
+                $data['errorMessage']=  is_array($signupResponse['response']['messages'])?$signupResponse['response']['messages'][0]:$signupResponse['response']['messages'];
             }
         }
         if(isset($signupSuccess)){

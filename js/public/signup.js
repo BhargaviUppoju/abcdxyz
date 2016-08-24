@@ -69,9 +69,10 @@ $(document).ready(function(){
             if ($(form).valid())
             {
                if($('#inputPassword').val()==$('#inputConfirmPassword').val()){
+                   $('#passwordsError').text('');
                   form.submit(); 
                }else{
-                   $('#passwordsError').text('Entered passwords should be matched.')
+                   $('#passwordsError').text('Entered passwords should be matched.');
                }
                
             }

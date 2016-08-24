@@ -88,17 +88,10 @@ class CI_Config {
 		// Set the base_url automatically if none was provided
 		if (empty($this->config['base_url']))
 		{
-			if (isset($_SERVER['SERVER_ADDR']))
+			if (isset($_SERVER['SERVER_NAME']))
 			{
-				if (strpos($_SERVER['SERVER_ADDR'], ':') !== FALSE)
-				{
-					$server_addr = '['.$_SERVER['SERVER_ADDR'].']';
-				}
-				else
-				{
-					$server_addr = $_SERVER['SERVER_ADDR'];
-				}
 
+				$server_addr = $_SERVER['SERVER_NAME'];
 				$base_url = (is_https() ? 'https' : 'http').'://'.$server_addr
 					.substr($_SERVER['SCRIPT_NAME'], 0, strpos($_SERVER['SCRIPT_NAME'], basename($_SERVER['SCRIPT_FILENAME'])));
 			}
@@ -249,7 +242,7 @@ class CI_Config {
 			if ($protocol === '')
 			{
 				$base_url = substr($base_url, strpos($base_url, '//'));
-		}
+			}
 			else
 			{
 				$base_url = $protocol.substr($base_url, strpos($base_url, '://'));
@@ -273,11 +266,11 @@ class CI_Config {
 				{
 					$uri = substr($uri, 0, $offset).$suffix.substr($uri, $offset);
 				}
-		else
-		{
+				else
+				{
 					$uri .= $suffix;
-		}
-	}
+				}
+			}
 
 			return $base_url.$this->slash_item('index_page').$uri;
 		}

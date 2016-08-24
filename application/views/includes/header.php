@@ -16,11 +16,12 @@
             var api_path = '<?php echo $this->config->item('api_path'); ?>';
             var images_static_path = '<?php echo $imgStaticPath; ?>';
          </script>
-        <script type="text/javascript" src="<?php echo $jsPublicPath.'/jquery-1.11.3.min.js';?>"></script>
-         <script type='text/javascript' src="<?php echo $jsPublicPath.'/jQuery'.$jsExt;?>"></script>
-         <script type='text/javascript' src='<?php echo $jsPublicPath."/jquery.validate".$jsExt;?>'></script>    
-         <link rel='stylesheet' href='<?php echo $cssPublicPath.'/jquery-ui'.$cssExt; ?>'>
-         <link rel='stylesheet' href='<?php echo $cssPublicPath.'/common'.$cssExt; ?>'>
+        <script type="text/javascript" src="<?php echo $jsPublicPath.'jquery-1.11.3.min.js';?>"></script>
+         <script type='text/javascript' src="<?php echo $jsPublicPath.'jQuery'.$jsExt;?>"></script>
+         <script type='text/javascript' src='<?php echo $jsPublicPath."jquery.validate".$jsExt;?>'></script>    
+         <link rel='stylesheet' href='<?php echo $cssPublicPath.'jquery-ui'.$cssExt; ?>'>
+         <link rel='stylesheet' href='<?php echo $cssPublicPath.'common'.$cssExt; ?>'>
+         <link rel='stylesheet' href='<?php echo $cssPublicPath.'bootstrap'.$cssExt; ?>'>
         <?php if(isset($cssArray)){
             foreach($cssArray as $cssFile){?>
             <link rel='stylesheet' href="<?php echo $cssFile.$cssExt;?>">

@@ -526,8 +526,10 @@ switch (getenv('HTTP_HOST')) {
         $config['css_gz_extension']='.css';
         break;
     case 'default':
-         $config['js_public_path'] = $config['protocol']. $_SERVER['HTTP_HOST'] . "/js/public/";
+        $config['js_public_path'] = $config['protocol']. $_SERVER['HTTP_HOST'] . "/js/public/";
         $config['css_public_path'] = $config['protocol']. $_SERVER['HTTP_HOST'] . "/css/public/";
         $config['images_static_path']=$config['protocol'].$_SERVER['HTTP_HOST']."images/static/";
+        $config['js_gz_extension']='.js';
+        $config['css_gz_extension']='.css';
         break;
 }

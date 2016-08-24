@@ -13,18 +13,14 @@ function encryptPassword($passwordString) {
     return md5($passwordString);
 }
 
-//function site_url() {
-//    return 'http://'. $_SERVER['HTTP_HOST'];
-//}
-
 function commonHelperGetPageUrl($pageName, $params = "", $getParams = "") {
     $pageUrls = array();
     $pageSiteUrl = site_url();
-    $pageUrls['home'] = $pageSiteUrl.'/home';
-    $pageUrls['signup'] = $pageSiteUrl.'/signup/';
-    $pageUrls['login'] = $pageSiteUrl.'/login';
-    $pageUrls['dashboard'] = $pageSiteUrl.'/dashboard';
-    $pageUrls['logout'] = $pageSiteUrl.'/logout';
+    $pageUrls['home'] = $pageSiteUrl.'home';
+    $pageUrls['signup'] = $pageSiteUrl.'signup/';
+    $pageUrls['login'] = $pageSiteUrl.'login';
+    $pageUrls['dashboard'] = $pageSiteUrl.'dashboard';
+    $pageUrls['logout'] = $pageSiteUrl.'logout';
     $params = str_replace('&', '/', $params);
     $return = (isset($pageUrls[$pageName])) ? $pageUrls[$pageName] : $pageUrls['home'];
     $return.= (strlen($params) > 0) ? str_replace("&", "/", $params) : "";

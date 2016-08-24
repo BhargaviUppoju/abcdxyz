@@ -1,14 +1,9 @@
-<html>
-    <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Register Here</title>
-<!--<link href="css/style.css" rel="stylesheet" type="text/css">-->
-<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-<!--<link rel="stylesheet" href="css/bootstrap-theme.min.css">-->
-</head>
-<body>
 <div class="container">
  <h2>Register Here</h2>
+<?php if(isset($errorMessage)){?>
+ <div class="error"> <p><?php echo $errorMessage;?></p></div>
+<?php }
+?>
  <form class="form-horizontal" method="post" name="signupForm" id="signupForm">
     <div class="form-group">
         <label for="inputFirstName" class="control-label col-xs-2"><span class="mandatory">*</span>First Name</label>
@@ -37,7 +32,7 @@
     <div class="form-group">
         <label for="inputMobileNumber" class="control-label col-xs-2">Mobile Number</label>
         <div class="col-xs-3">
-            <input type="text" name="inputMobileNumber"   id="inputEmail" title="Mobile Number" value="" size="30" maxlength="50" >
+            <input type="text" name="inputMobileNumber"   class="form-control" id="inputEmail" title="Mobile Number" value="" size="30" maxlength="50" >
         </div>
     </div>
     <div class="form-group">
@@ -68,5 +63,3 @@
     </div>
 </form>
 </div>
-</body>
-</html>

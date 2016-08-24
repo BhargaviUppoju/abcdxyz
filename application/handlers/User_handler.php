@@ -16,15 +16,12 @@ class User_handler extends Handler {
         //checking validation using Group Validation (signup)  
         if ($this->ci->form_validation->run('signup') == FALSE) { 
             $errorMsg = $this->ci->form_validation->get_errors();
-            //creating response output
             $output = parent::createResponse(FALSE, $errorMsg['message'], STATUS_BAD_REQUEST);
             return $output;
         } elseif($inputArray['inputPassword']!=$inputArray['inputConfirmPassword']){
             $output = parent::createResponse(FALSE, PASSWORDS_ERROR, STATUS_BAD_REQUEST);
             return $output;
         }else {
-
-            //Setting Data for inserting
             $data['firstname'] = $inputArray['inputFirstName'];
             $data['lastname'] = $inputArray['inputLastName'];
             $data['email'] = $inputArray['inputEmail'];
@@ -41,6 +38,7 @@ class User_handler extends Handler {
             $data['status'] = 1;
             $data['email'] = $inputArray['inputEmail'];
             $inputUserName['username']=$inputArray['inputUserName'];
+            //User name check
             $userNameResponse=$this->getUserData($inputUserName);
             if($userNameResponse['status'] && $userNameResponse['response']['total']>0){
                 $output = parent::createResponse(FALSE, REGISTERED_USERNAME, STATUS_CONFLICT);
@@ -48,8 +46,8 @@ class User_handler extends Handler {
             }elseif(!$userNameResponse['status']){
                 return $userNameResponse;
             }
+            //Email check
             if (empty($data['email']) || !$this->emailExist($data['email'])) {
-                //setting data for inserting
                 $this->ci->user_model->setInsertUpdateData($data);
                 $response = $this->ci->user_model->insert_data();
                 if ($response) {
@@ -286,18 +284,16 @@ class User_handler extends Handler {
             return FALSE;
     }
     
+    //Creating the userrole for the given userid
     public function createUserRole($inputArray) {
         
         $this->ci->form_validation->reset_form_rules();
         $this->ci->form_validation->pass_array($inputArray);
         $this->ci->form_validation->set_rules('userid', 'userid', 'is_natural_no_zero|required_strict');
-        $this->ci->form_validation->set_rules('userrole', 'User Role', '|required_strict');
+        $this->ci->form_validation->set_rules('userrole', 'User Role', 'alpha|required_strict');
         if ($this->ci->form_validation->run() == FALSE) {
-            $response = $this->ci->form_validation->get_errors();
-            $output['status'] = FALSE;
-            $output['response']['messages'] = $response['message'];
-            $output['response']['total'] = 0;
-            $output['statusCode'] = STATUS_BAD_REQUEST;
+            $errorMsg = $this->ci->form_validation->get_errors();
+            $output = parent::createResponse(FALSE, $errorMsg['message'], STATUS_BAD_REQUEST);
             return $output;
         }
         
@@ -314,15 +310,10 @@ class User_handler extends Handler {
         $userRoleData = $this->ci->userrole_model->insert_data();
         
         if (count($userRoleData) > 0) {
-            $output['status'] = TRUE;
-            $output['response']['messages'][] = SUCCESS_USERROLE;
-            $output['statusCode'] = STATUS_CREATED;
+            $output = parent::createResponse(TRUE, SUCCESS_USERROLE, STATUS_CREATED);
             return $output;
         }
-        
-        $output['status'] = FALSE;
-        $output['response']['messages'] = ERROR_SOMETHING_WENT_WRONG;
-        $output['statusCode'] = STATUS_BAD_REQUEST;
+        $output = parent::createResponse(FALSE, ERROR_SOMETHING_WENT_WRONG, STATUS_BAD_REQUEST);
         return $output;
     }
 
