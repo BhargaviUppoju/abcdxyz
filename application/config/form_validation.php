@@ -3,6 +3,18 @@
 /* setting validation group */
 
 $config = array(
+    'login' => array(
+        array(
+            'field' => 'username',
+            'label' => 'Username',
+            'rules' => 'required_strict'
+        ),
+        array(
+            'field' => 'password',
+            'label' => 'Password',
+            'rules' => 'required_strict'
+        )
+    ),
 'signup' => array(
         array(
             'field' => 'inputFirstName',
@@ -40,5 +52,6 @@ $config = array(
             'rules' => 'required_strict|min_length[6]'
         )
     )
+    
 );
 

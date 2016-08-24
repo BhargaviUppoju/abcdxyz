@@ -49,24 +49,23 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 // ------------------------------------------------------------------------
 
-//if ( ! function_exists('site_url'))
-//{
-//	/**
-//	 * Site URL
-//	 *
-//	 * Create a local URL based on your basepath. Segments can be passed via the
-//	 * first parameter either as a string or an array.
-//	 *
-//	 * @param	string	$uri
-//	 * @param	string	$protocol
-//	 * @return	string
-//	 */
-//	function site_url($uri = '')
-//	{
-//		$CI =& get_instance();
-//		return $CI->config->site_url($uri);
-//	}
-//}
+if ( ! function_exists('site_url'))
+{
+	/**
+	 * Site URL
+	 *
+	 * Create a local URL based on your basepath. Segments can be passed via the
+	 * first parameter either as a string or an array.
+	 *
+	 * @param	string	$uri
+	 * @param	string	$protocol
+	 * @return	string
+	 */
+	function site_url($uri = '', $protocol = NULL)
+	{
+		return get_instance()->config->site_url($uri, $protocol);
+	}
+}
 
 // ------------------------------------------------------------------------
 

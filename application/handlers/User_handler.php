@@ -1,5 +1,5 @@
 <?php
-require_once(APPPATH . 'handlers/handler.php');
+require_once(APPPATH . 'handlers/Handler.php');
 
 class User_handler extends Handler {
     
@@ -7,13 +7,13 @@ class User_handler extends Handler {
     public function __construct() {
         parent::__construct();
         $this->ci = parent::$CI;
-        $this->ci->load->model('User_model');
-        $this->ci->load->model('Userrole_model');
+        $this->ci->load->model('user_model');
+        $this->ci->load->model('userrole_model');
     }
     
     public function signup($inputArray) {
         $this->ci->form_validation->pass_array($inputArray);
-        //checking validation using Group Validation (signup)        
+        //checking validation using Group Validation (signup)  
         if ($this->ci->form_validation->run('signup') == FALSE) { 
             $errorMsg = $this->ci->form_validation->get_errors();
             //creating response output
@@ -50,8 +50,8 @@ class User_handler extends Handler {
             }
             if (empty($data['email']) || !$this->emailExist($data['email'])) {
                 //setting data for inserting
-                $this->ci->User_model->setInsertUpdateData($data);
-                $response = $this->ci->User_model->insert_data();
+                $this->ci->user_model->setInsertUpdateData($data);
+                $response = $this->ci->user_model->insert_data();
                 if ($response) {
                     $roleInput['userid']=$response;
                     $roleInput['userrole']=$inputArray['userrole'];
@@ -74,11 +74,12 @@ class User_handler extends Handler {
             }
         }
     }
+    
     public function login($inputArray) {
         
         $this->ci->form_validation->reset_form_rules();
         $this->ci->form_validation->pass_array($inputArray);
-        $this->ci->form_validation->set_rules('email', 'email', 'required_strict');
+        $this->ci->form_validation->set_rules('username', 'username', 'required_strict');
         $this->ci->form_validation->set_rules('password', 'password', 'required_strict');
         
         if ($this->ci->form_validation->run() == FALSE) {
@@ -89,60 +90,45 @@ class User_handler extends Handler {
             return $output;
         }
         //set default values
-        $email = $password = '';
+        $username = $password = '';
         
-        $email = $inputArray['email'];
+        $username = $inputArray['username'];
         $password = $inputArray['password'];
         //get md5 encrypted password 
         $password = encryptPassword($inputArray['password']);
         
-        if (!empty($email) && !empty($password)) {
-            $input['email'] = $email;
+        if (!empty($username) && !empty($password)) {
+            $input['username'] = $username;
             $input['password'] = $password;
         }
         
         $userData = $this->getUserData($input);
-                
-        if ($userData['status']) {
-            if ($userData['response']['total'] > 0) {
+        if($userData['status']){
+            if($userData['response']['total']>0){
                 $input['userid'] = $userData['response']['userData']['id'];
                 //getting user role
                 $userRole = $this->getUserRole($input);
-                
                 if($userRole['status']){
-                    $role = '';
-                    if ($userRole['response']['total'] > 0) {
-                       //print_r($userRole['response']['userRoleData']);
-                       $role = $userRole['response']['userRoleData']['role'];
+//                    $role = '';
+                    if($userRole['response']['total'] > 0){
+//                    $role = $userRole['response']['userRoleData']['role'];
+                    $userData['response']['userData']['role'] =  $userRole['response']['userRoleData']['role'];
+                    $sessionData = $userData['response']['userData'];
                       //set userrole in the session  
-                        $this->setSession($userRole['response']['userRoleData'])  ;
-                        
-                        $output['status'] = TRUE;
-                        $output['response']['userData'] = $userData['response']['userData'];
-                        $output['response']['messages'] = array();
-                        $output['response']['total'] = ($userData['response']['total']);
-                        $output['statusCode'] = STATUS_OK;
-                    }else {
-                        $output['status'] = FALSE;
-                        $output['response']['messages'][] = ERROR_INVALID_USER;
-                        $output['response']['total'] = 0;
-                        $output['statusCode'] = STATUS_INVALID_USER;
+                        $this->setSession($sessionData);
+                        $output = parent::createResponse(TRUE, SUCCESS_LOGIN, STATUS_OK);
                         return $output;
                     }
-                }else{
-                    return $userRole;
                 }
-                
+            }else{ 
+                         $output = parent::createResponse(FALSE, ERROR_INVALID_USER, STATUS_INVALID_USER);
+                         return $output;
+                    }
+                 
             }else {
-                $output['status'] = FALSE;
-                $output['response']['messages'][] = ERROR_INVALID_USER;
-                $output['response']['total'] = 0;
-                $output['statusCode'] = STATUS_INVALID_USER;
-                return $output;
-            }
-        }else {
-            return $userData;
-        }
+                    $output = parent::createResponse(FALSE, ERROR_SOMETHING_WENT_WRONG, STATUS_SERVER_ERROR);
+                    return $output;
+                }
     }
     
     public function logout() {
@@ -152,15 +138,10 @@ class User_handler extends Handler {
         if ($returnStatus) {
             $status = true;
         } else {
-            $output['status'] = FALSE;
-            $output['response']['messages'][] = ERROR_NO_SESSION;
-            $output['statusCode'] = 507;
+            $output = parent::createResponse(FALSE, ERROR_NO_SESSION, 507);
             return $output;
         }
-        $output['status'] = TRUE;
-        $output['response']['loggedout'] = $status;
-        $output['response']['messages'] = array();
-        $output['statusCode'] = STATUS_OK;
+        $output = parent::createResponse(TRUE, SUCCESS_LOGOUT, STATUS_OK,0,'loggedout',$status);
         return $output;
     }
     
@@ -168,7 +149,6 @@ class User_handler extends Handler {
         
         $this->ci->form_validation->reset_form_rules();
         $this->ci->form_validation->pass_array($inputArray);
-        $this->ci->form_validation->set_rules('email', 'email', 'valid_email');
         $this->ci->form_validation->set_rules('status', 'status', 'is_natural_no_zero');
         $this->ci->form_validation->set_rules('username', 'User Name', 'min_length[6]|max_length[50]');
         
@@ -190,33 +170,31 @@ class User_handler extends Handler {
             $password = $inputArray['password'];
         }
         
-        $this->ci->User_model->resetVariable();
-        $selectInput['id'] = $this->ci->User_model->id;
-        $selectInput['email'] = $this->ci->User_model->email;
-        $selectInput['password'] = $this->ci->User_model->password;
-        $selectInput['firstname'] = $this->ci->User_model->firstname;
-        $selectInput['lastname'] = $this->ci->User_model->lastname;
-        $selectInput['mobile'] = $this->ci->User_model->mobile;
-        $selectInput['status'] = $this->ci->User_model->status;
-        $selectInput['activated'] = $this->ci->User_model->activated;
+        $this->ci->user_model->resetVariable();
+        $selectInput['id'] = $this->ci->user_model->id;
+        $selectInput['email'] = $this->ci->user_model->email;
+        $selectInput['password'] = $this->ci->user_model->password;
+        $selectInput['firstname'] = $this->ci->user_model->firstname;
+        $selectInput['lastname'] = $this->ci->user_model->lastname;
+        $selectInput['mobile'] = $this->ci->user_model->mobile;
+        $selectInput['status'] = $this->ci->user_model->status;
+        $selectInput['activated'] = $this->ci->user_model->activated;
+        $selectInput['username'] = $this->ci->user_model->username;
         
-        $this->ci->User_model->setSelect($selectInput);
+        $this->ci->user_model->setSelect($selectInput);
         
-        $where[$this->ci->User_model->deleted] = 0;
+        $where[$this->ci->user_model->deleted] = 0;
         
-        if (isset($inputArray['email']) && $inputArray['email'] != '') {
-            $where[$this->ci->User_model->email] = $inputArray['email'];
-        }
         if (!empty($password)) {
-            $where[$this->ci->User_model->password] = $password;
+            $where[$this->ci->user_model->password] = $password;
         }
         if (isset($inputArray['username']) && !empty($inputArray['username'])) {
-            $where[$this->ci->User_model->username] = $inputArray['username'];
+            $where[$this->ci->user_model->username] = $inputArray['username'];
         }
 
-        $this->ci->User_model->setWhere($where);
-        $this->ci->User_model->setRecords(1);
-        $userData = $this->ci->User_model->get();
+        $this->ci->user_model->setWhere($where);
+        $this->ci->user_model->setRecords(1);
+        $userData = $this->ci->user_model->get();
         
         if (count($userData) == 0) {
             $output['status'] = TRUE;
@@ -250,19 +228,19 @@ class User_handler extends Handler {
             return $output;
         }
         
-        $this->ci->Userrole_model->resetVariable();
-        $selectInput['id'] = $this->ci->Userrole_model->id;
-        $selectInput['role'] = $this->ci->Userrole_model->role;
-        $selectInput['status'] = $this->ci->Userrole_model->status;
+        $this->ci->userrole_model->resetVariable();
+        $selectInput['id'] = $this->ci->userrole_model->id;
+        $selectInput['role'] = $this->ci->userrole_model->role;
+        $selectInput['status'] = $this->ci->userrole_model->status;
         
-        $this->ci->Userrole_model->setSelect($selectInput);
+        $this->ci->userrole_model->setSelect($selectInput);
         
-        $where[$this->ci->Userrole_model->deleted] = 0;
-        $where[$this->ci->Userrole_model->status] = 1;
-        $where[$this->ci->Userrole_model->userid] = $inputArray['userid'];
-        $this->ci->Userrole_model->setWhere($where);
-        $this->ci->Userrole_model->setRecords(1);
-        $userRoleData = $this->ci->Userrole_model->get();
+        $where[$this->ci->userrole_model->deleted] = 0;
+        $where[$this->ci->userrole_model->status] = 1;
+        $where[$this->ci->userrole_model->userid] = $inputArray['userid'];
+        $this->ci->userrole_model->setWhere($where);
+        $this->ci->userrole_model->setRecords(1);
+        $userRoleData = $this->ci->userrole_model->get();
         
         if (count($userRoleData) == 0) {
             $output['status'] = TRUE;
@@ -280,11 +258,13 @@ class User_handler extends Handler {
         return $output;
     }
     
-    function setSession($userRoleData) {
+    function setSession($userData) { print_r($userData);
         $this->ci->customsession->destroy();
         //  print_r($userData);
-        $this->ci->customsession->setData(USER_ID, $userRoleData['userid']);
-        if($userRoleData['role'] == USER_TRAINER){
+        $this->ci->customsession->setData(USER_ID, $userData['id']);
+        $this->ci->customsession->setData(USERNAME, $userData['username']);
+        $this->ci->customsession->setData(USER_EMAIL, $userData['email']);
+        if($userData['role'] == USER_TRAINER){
             $this->ci->customsession->setData(USER_ROLE, USER_TRAINER);
         }else{
             $this->ci->customsession->setData(USER_ROLE, USER_TRAINEE);
@@ -294,12 +274,12 @@ class User_handler extends Handler {
     //Function to check if email already exists in user table
     function emailExist($email) {
         $selectInput = array();
-        $selectInput['id'] = $this->ci->User_model->id;
-        $this->ci->User_model->setSelect($selectInput);
-        $where[$this->ci->User_model->email] = $email;
-        $where[$this->ci->User_model->deleted] = 0;
-        $this->ci->User_model->setWhere($where);
-        $emailExists = $this->ci->User_model->get();
+        $selectInput['id'] = $this->ci->user_model->id;
+        $this->ci->user_model->setSelect($selectInput);
+        $where[$this->ci->user_model->email] = $email;
+        $where[$this->ci->user_model->deleted] = 0;
+        $this->ci->user_model->setWhere($where);
+        $emailExists = $this->ci->user_model->get();
         if (count($emailExists) > 0)
             return TRUE;
         else
@@ -321,17 +301,17 @@ class User_handler extends Handler {
             return $output;
         }
         
-        $this->ci->Userrole_model->resetVariable();
-        $selectInput['id'] = $this->ci->Userrole_model->id;
+        $this->ci->userrole_model->resetVariable();
+        $selectInput['id'] = $this->ci->userrole_model->id;
         
-        $this->ci->Userrole_model->setSelect($selectInput);
+        $this->ci->userrole_model->setSelect($selectInput);
         
-        $insertUpdateData[$this->ci->Userrole_model->deleted] = 0;
-        $insertUpdateData[$this->ci->Userrole_model->status] = 1;
-        $insertUpdateData[$this->ci->Userrole_model->userid] = $inputArray['userid'];
-        $insertUpdateData[$this->ci->Userrole_model->role] = $inputArray['userrole'];
-        $this->ci->Userrole_model->setInsertUpdateData($insertUpdateData);
-        $userRoleData = $this->ci->Userrole_model->insert_data();
+        $insertUpdateData[$this->ci->userrole_model->deleted] = 0;
+        $insertUpdateData[$this->ci->userrole_model->status] = 1;
+        $insertUpdateData[$this->ci->userrole_model->userid] = $inputArray['userid'];
+        $insertUpdateData[$this->ci->userrole_model->role] = $inputArray['userrole'];
+        $this->ci->userrole_model->setInsertUpdateData($insertUpdateData);
+        $userRoleData = $this->ci->userrole_model->insert_data();
         
         if (count($userRoleData) > 0) {
             $output['status'] = TRUE;

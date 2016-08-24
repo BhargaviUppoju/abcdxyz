@@ -1,7 +1,7 @@
 <?php
 
 defined('BASEPATH') or exit('No direct script access allowed');
-require_once (APPPATH . 'handlers/handler.php');
+require_once (APPPATH . 'handlers/Handler.php');
 
 class Customsession {
 

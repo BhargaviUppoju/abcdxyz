@@ -917,14 +917,14 @@ class CI_Form_validation {
 		$result = (!preg_match("/^([a-z0-9\+_\-]+)(\.[a-z0-9\+_\-]+)*@([a-z0-9\-]+\.)+[a-z]{1,6}$/ix", $str)) ? FALSE : TRUE;
                 
                 if($result==TRUE){
-                $blockedDomains=$this->CI->config->item('blockedEmailDomains');
-                $domain = '@'.substr(strrchr($str, "@"), 1);
-                
-                foreach ($blockedDomains as $key => $value) {
-                   if($domain==$value){
-                       return FALSE;
-                   }
-                }
+//                $blockedDomains=$this->CI->config->item('blockedEmailDomains');
+//                $domain = '@'.substr(strrchr($str, "@"), 1);
+//                
+//                foreach ($blockedDomains as $key => $value) {
+//                   if($domain==$value){
+//                       return FALSE;
+//                   }
+//                }
                 return TRUE;
                 }else{
                     return FALSE;

@@ -102,7 +102,9 @@ define('STATUS_INVALID_USER', 506);
 define('ERROR_NO_SESSION',"No active session");
 
 //user related messages
-define("ERROR_INVALID_USER","Invalid email/password");
+define('SUCCESS_LOGIN', 'Login Successful');
+define('SUCCESS_LOGOUT', 'Logout Successful');
+define("ERROR_INVALID_USER","Invalid username/password");
 define("ERROR_NO_USER","User is not registered");
 define("SUCCESS_ADDED_USER","User created");
 define("SUCCESS_USERROLE","User role created");
@@ -111,6 +113,8 @@ define("USER_ROLE", "userrole");
 define("USER_ID", "userid");
 define("USER_TRAINEE", "member");
 define("USER_TRAINER", "trainer");
+define("USERNAME", "username");
+define("USER_EMAIL", "email");
 
 //Signup related
 define('SUCCESS_SIGNUP', 'Registration Successful');
