@@ -91,6 +91,11 @@ switch (ENVIRONMENT)
 }
 
 /*
+   * setting GMT timezone by deafult at Application level 
+*/ 
+	date_default_timezone_set('UTC');
+
+/*
  *---------------------------------------------------------------
  * SYSTEM DIRECTORY NAME
  *---------------------------------------------------------------
