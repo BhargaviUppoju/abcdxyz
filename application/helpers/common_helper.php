@@ -143,5 +143,20 @@ function getSessionUserId(){
     return getUserId();       
 }
 
+function commonHelperGetIdArray($input, $groupByKey = 'id') {
+    $returnArray = array();
+    if (count($input) > 0) {
+        foreach ($input as $key => $val) {
+            $keyname = $val[$groupByKey];
+            foreach ($val as $id => $value) {
+                if ($id == $groupByKey)
+                    $keyname = $value;
+                $returnArray[$keyname][$id] = $value;
+            }
+        }
+    }
+    return $returnArray;
+}
+
 ?>
 

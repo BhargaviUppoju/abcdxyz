@@ -12,9 +12,9 @@ $uname = $this->customsession->getData(USERNAME);
         <?php if ($role == USER_TRAINEE) { ?>
             <p>Hello <?php echo $uname; ?></p>
             <pre>These are the list of trainers available 
-                1.Anand
-                2.Michel
-                3>Bob
+            <?php foreach ($trainersList as $key => $data) { ?>
+                       * <a target="_blank" href="<?php// echo commonHelperGetPageUrl('teacher'); ?>"><?php echo $data['username']; ?></a>
+            <?php } ?>
             </pre>
         <?php } else { ?> 
             <p>Hello <?php echo $uname; ?></p>

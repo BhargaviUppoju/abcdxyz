@@ -10,7 +10,11 @@ class User extends CI_Controller{
             parent::__construct();
             $this->userHandler = new User_handler();
         }
-    public function login() {
+    public function login() { 
+        $uid = $this->customsession->getUserId();
+    	if($uid>0){
+    		header('Location:'.commonHelperGetPageUrl('dashboard'));
+    	}
         $data = array();
         $inputArray = $this->input->post();
         $data['content'] = 'login_view';

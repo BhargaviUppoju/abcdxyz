@@ -152,10 +152,7 @@ class User_handler extends Handler {
         
         if ($this->ci->form_validation->run() == FALSE) {
             $response = $this->ci->form_validation->get_errors();
-            $output['status'] = FALSE;
-            $output['response']['messages'] = $response['message'];
-            $output['response']['total'] = 0;
-            $output['statusCode'] = STATUS_BAD_REQUEST;
+            $output = parent::createResponse(FALSE, $response['message'], STATUS_BAD_REQUEST);
             return $output;
         }
         
@@ -195,18 +192,10 @@ class User_handler extends Handler {
         $userData = $this->ci->user_model->get();
         
         if (count($userData) == 0) {
-            $output['status'] = TRUE;
-            $output['response']['messages'][] = ERROR_NO_USER;
-            $output['response']['total'] = 0;
-            $output['statusCode'] = STATUS_INVALID_USER;
+            $output = parent::createResponse(TRUE, ERROR_NO_USER, STATUS_INVALID_USER);
             return $output;
         }
-        
-        $output['status'] = TRUE;
-        $output['response']['userData'] = $userData[0];
-        $output['response']['messages'] = array();
-        $output['response']['total'] = 1;
-        $output['statusCode'] = STATUS_OK;
+        $output = parent::createResponse(TRUE, DATA_SUCCESS, STATUS_OK,1,'userData',$userData[0]);
         return $output;
         
     }
@@ -219,10 +208,7 @@ class User_handler extends Handler {
         
         if ($this->ci->form_validation->run() == FALSE) {
             $response = $this->ci->form_validation->get_errors();
-            $output['status'] = FALSE;
-            $output['response']['messages'] = $response['message'];
-            $output['response']['total'] = 0;
-            $output['statusCode'] = STATUS_BAD_REQUEST;
+            $output = parent::createResponse(FALSE, $response['message'], STATUS_BAD_REQUEST);
             return $output;
         }
         
@@ -241,22 +227,14 @@ class User_handler extends Handler {
         $userRoleData = $this->ci->userrole_model->get();
         
         if (count($userRoleData) == 0) {
-            $output['status'] = TRUE;
-            $output['response']['messages'][] = ERROR_NO_USER;
-            $output['response']['total'] = 0;
-            $output['statusCode'] = STATUS_INVALID_USER;
+            $output = parent::createResponse(TRUE, ERROR_NO_USER, STATUS_INVALID_USER);
             return $output;
         }
-        
-        $output['status'] = TRUE;
-        $output['response']['userRoleData'] = $userRoleData[0];
-        $output['response']['messages'] = array();
-        $output['response']['total'] = 1;
-        $output['statusCode'] = STATUS_OK;
+        $output = parent::createResponse(TRUE, DATA_SUCCESS, STATUS_OK,1,'userRoleData',$userRoleData[0]);
         return $output;
     }
     
-    function setSession($userData) { print_r($userData);
+    function setSession($userData) {
         $this->ci->customsession->destroy();
         //  print_r($userData);
         $this->ci->customsession->setData(USER_ID, $userData['id']);
@@ -315,6 +293,58 @@ class User_handler extends Handler {
         }
         $output = parent::createResponse(FALSE, ERROR_SOMETHING_WENT_WRONG, STATUS_BAD_REQUEST);
         return $output;
+    }
+    
+    public function getTrainers() {
+        $userId = $this->ci->customsession->getData(USER_ID);
+        $isLogin = ($userId > 0) ? 1 : 0;
+        if($isLogin){
+            
+            $selectInput['id'] = $this->ci->userrole_model->id;
+            $selectInput['userid'] = $this->ci->userrole_model->userid;
+        
+            $this->ci->userrole_model->setSelect($selectInput);
+            
+            $where[$this->ci->userrole_model->role] = USER_TRAINER;
+            $where[$this->ci->userrole_model->deleted] = 0;
+            $where[$this->ci->userrole_model->status] = 1;
+        
+            $this->ci->userrole_model->setWhere($where);
+            $userRoleData = $this->ci->userrole_model->get();
+            
+            $userIdsArray = commonHelperGetIdArray($userRoleData, 'id');
+            
+            $selectUserInput['id'] = $this->ci->user_model->id;
+            $selectUserInput['email'] = $this->ci->user_model->email;
+            $selectUserInput['firstname'] = $this->ci->user_model->firstname;
+            $selectUserInput['lastname'] = $this->ci->user_model->lastname;
+            $selectUserInput['mobile'] = $this->ci->user_model->mobile;
+            $selectUserInput['username'] = $this->ci->user_model->username;
+            
+            $this->ci->user_model->setSelect($selectUserInput);
+            
+            $userwhere[$this->ci->user_model->deleted] = 0;
+            $userwhere[$this->ci->user_model->activated] = 1;
+            $userwhere[$this->ci->user_model->status]=1;
+            
+            $this->ci->user_model->setWhere($userwhere);
+            
+            $whereInArray = array();
+            $whereInArray[$this->ci->user_model->id] = array_keys($userIdsArray);
+            $this->ci->user_model->setWhereIns($whereInArray);
+//            echo $this->ci->user_model->get();
+            $trainersData = $this->ci->user_model->get();
+            
+            if (count($trainersData) == 0) {
+                $output = parent::createResponse(TRUE, ERROR_NO_DATA, STATUS_OK);
+                return $output;
+            }
+            $output = parent::createResponse(TRUE, DATA_SUCCESS, STATUS_OK,count($trainersData),'trainersData',$trainersData);
+            return $output;
+        }else{
+            $output = parent::createResponse(FALSE, ERROR_SOMETHING_WENT_WRONG, STATUS_BAD_REQUEST);
+            return $output;
+        }
     }
 
 }
